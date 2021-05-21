@@ -1,0 +1,22 @@
+name = "BadukGoWeiqiTools"
+uuid = "71566503-fddc-4190-936c-ecb38fefcffd"
+authors = ["xiaodaigh <zhuojia.dai@gmail.com> and contributors"]
+version = "0.1.0"
+
+[deps]
+Cascadia = "54eefc05-d75b-58de-a785-1a3403f0919f"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Gumbo = "708ec375-b3d6-5a57-a7ce-8257bf98657a"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+JDF = "babc3d20-cd49-4f60-a736-a8f9c08892d3"
+TableScraper = "3d876f86-fca9-45cb-9864-7207416dc431"
+Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
