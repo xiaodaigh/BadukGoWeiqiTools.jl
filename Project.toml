@@ -14,6 +14,7 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [compat]
 HTTP = "0.9"
+TableScraper = "0.1"
 julia = "1"
 
 [extras]
