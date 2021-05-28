@@ -11,6 +11,9 @@ function right(str, start)
     String(str[5:end])
 end
 
+"""
+Scrape table from kifudepot.org
+"""
 function scrape_kifu_depot_table(; player="", event="", page::Int=1)
     url = "https://kifudepot.net/index.php?page=$page&move=&player=$player&event=$event"
     _scrape_kifu_depot_table(url)
