@@ -1,7 +1,6 @@
 using JSON3
 using Serialization
 using TableScraper: scrape_tables
-# NAME_DB_JSON = "playerdb-2021-05-03.json"
 
 using CodecZlib: GzipDecompressor
 
@@ -54,7 +53,6 @@ function create_names_db(json::JSON3.Array)
             end
         end
 
-        tmpnames = String[]
         for name in json1.names
             for sn in name.simplenames
                 simplenames[sn.name] = key
@@ -150,10 +148,5 @@ function create_names_db(json::JSON3.Array)
                     )
 
     merge!(simplenames, manuals)
-    # serialize("namesdb", simplenames)
     simplenames
-    # end
 end
-
-
-# const NAMESDB = create_names_db(joinpath("c:/git/BadukGoWeiqiTools/src/", NAME_DB_JSON); force=true);
