@@ -5,7 +5,7 @@ using HTTP: get
 import HTTP
 using TableScraper
 
-export scrape_kifu_depot_table, download_goratings
+export scrape_kifu_depot_table#, download_goratings
 
 function right(str, start)
     String(str[5:end])

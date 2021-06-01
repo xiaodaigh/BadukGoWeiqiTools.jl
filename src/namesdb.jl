@@ -7,32 +7,18 @@ using CodecZlib: GzipDecompressor
 export load_namesdb
 
 """
-returns the path to the .gz file download
-"""
-function download_latest_ugonet_db()::String
-    latest_row = scrape_tables("https://u-go.net/playerdb-archive/", identity)[1].rows[2]
-    link = latest_row[3][1].attributes["href"]
-    download(link)
-end
-
-function create_names_db(path_to_json::String; kwargs...)
-    text = readline(NAME_DB_JSON);
-    json = JSON3.read(text);
-
-    create_names_db(json; kwargs...)
-end
-
-
-"""
 Save a namesdb file somehwere
 """
-function load_namesdb(path; force=false)
+function load_namesdb(path="namesdb"; force=false)
     if force | !isfile(path)
-        tmp_path_gz = download_latest_ugonet_db()
-        json = JSON3.read(transcode(GzipDecompressor, read(tmp_path_gz)));
+        # download latest names database from ugo.net
+        latest_row = scrape_tables("https://u-go.net/playerdb-archive/", identity)[1].rows[2]
+        link = latest_row[3][1].attributes["href"]
+        http = HTTP.request("GET", link)
+        json = JSON3.read(transcode(GzipDecompressor, http.body))
         name_dict = create_names_db(json)
-
         serialize(path, name_dict)
+        @info "The Names database is cached at path `$path`"
         return name_dict
     else
         deserialize(path)
@@ -149,4 +135,11 @@ function create_names_db(json::JSON3.Array)
 
     merge!(simplenames, manuals)
     simplenames
+end
+
+function create_names_db(path_to_json::String; kwargs...)
+    text = readline(NAME_DB_JSON);
+    json = JSON3.read(text);
+
+    create_names_db(json; kwargs...)
 end
