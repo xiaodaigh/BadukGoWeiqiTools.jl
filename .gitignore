@@ -24,3 +24,5 @@ docs/site/
 Manifest.toml
 *.json
 NAMESDB
+analysis_logs/
+dev.jl

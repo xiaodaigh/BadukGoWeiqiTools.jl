@@ -4,12 +4,12 @@ using TableScraper: scrape_tables
 
 using CodecZlib: GzipDecompressor
 
-export load_namesdb
+export load_namesdb, create_names_to_nationality_tbl
 
 """
 Save a namesdb file somehwere
 """
-function load_namesdb(path="namesdb"; force=false)
+function load_namesdb(path = "namesdb"; force = false)
     if force | !isfile(path)
         # download latest names database from ugo.net
         latest_row = scrape_tables("https://u-go.net/playerdb-archive/", identity)[1].rows[2]
@@ -161,8 +161,37 @@ function create_names_db(json::JSON3.Array)
 end
 
 function create_names_db(path_to_json::String; kwargs...)
-    text = readline(NAME_DB_JSON);
-    json = JSON3.read(text);
+    text = readline(NAME_DB_JSON)
+    json = JSON3.read(text)
 
     create_names_db(json; kwargs...)
+end
+
+function create_names_to_nationality_tbl()
+    latest_row = scrape_tables("https://u-go.net/playerdb-archive/", identity)[1].rows[2]
+    link = latest_row[3][1].attributes["href"]
+    http = HTTP.request("GET", link)
+    json = JSON3.read(transcode(GzipDecompressor, http.body))
+
+    res = Dict{String,Tuple{String,String}}()
+    for json1 in json
+        key = json1.key_name
+        for name in json1.names
+            any_in_go4go = filter(jn -> "Go4go" in jn.databases, name.simplenames)
+            if length(any_in_go4go) >= 1
+                key = any_in_go4go[1].name
+            end
+        end
+
+
+        res[key] = (json1.citizenship, json1.affiliation)
+    end
+
+    df = DataFrame(
+        name = keys(res) |> collect,
+        nationality = [val[1] for val in values(res)],
+        affiliation = [val[2] for val in values(res)],
+    )
+
+    return df
 end
