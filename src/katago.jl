@@ -1,11 +1,11 @@
 
 export analyze_sgf
 
-sgf_moves_to_katago_json(sgf::SGF) = sgf_moves_to_katago_json(sgf.moves)
+sgf_moves_to_katago_json(sgf::SGF; kwargs...) = sgf_moves_to_katago_json(sgf.moves; kwargs...)
 
-function sgf_moves_to_katago_json(moves; id = randstring(8))
+function sgf_moves_to_katago_json(moves; id = randstring(8), rules="korean")
     json = copy(JSON3.read("""
-    {"rules":"tromp-taylor", "komi":7.5, "boardXSize":19, "boardYSize":19}
+    {"rules":"$rules", "boardXSize":19, "boardYSize":19}
     """
     ))
 
@@ -31,11 +31,11 @@ function analyze_sgf(path; kwargs...)
     analyze_sgf(SGF(path); kwargs...)
 end
 
-function analyze_sgf(sgf::SGF; katago_model_path, katago_config_path)
+function analyze_sgf(sgf::SGF; katago_model_path, katago_config_path, rules="korean")
     tf = tempname()
     tf_res = tempname()
 
-    json = sgf_moves_to_katago_json(sgf)
+    json = sgf_moves_to_katago_json(sgf; rules)
 
     JSON3.write(tf, json)
 

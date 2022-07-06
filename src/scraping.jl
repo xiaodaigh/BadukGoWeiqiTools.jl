@@ -16,7 +16,11 @@ Scrape table from kifudepot.org
 """
 function scrape_kifu_depot_table(; player="", event="", page::Int=1)
     url = "https://kifudepot.net/index.php?page=$page&move=&player=$player&event=$event"
-    _scrape_kifu_depot_table(url)
+    tmp =  _scrape_kifu_depot_table(url)
+    transform(
+        tmp,
+        :black=>ByRow(x->replace(x, "羋昱廷" => "芈昱廷"))=>:black,
+        :white=>ByRow(x->replace(x, "羋昱廷" => "芈昱廷"))=>:white)
 end
 
 function _scrape_kifu_depot_table(url)
