@@ -27,3 +27,5 @@ NAMESDB
 analysis_logs/
 dev.jl
 analysis-results/
+*.jls
+*.dll
