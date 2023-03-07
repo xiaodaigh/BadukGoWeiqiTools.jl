@@ -15,13 +15,27 @@ struct Move
     end
 end
 
+# Used to check if a file name is too long
+function istoolong(filename)
+    try
+        stat(filename)
+        false
+    catch e
+        if isa(e, Base.IOError)
+            e.code == -36
+        else
+            rethrow()
+        end
+    end
+end
+
 # SGF stands for Smart Go (Game) Format
 struct SGF
     attributes::String
     moves::Vector{Move}
 
     function SGF(string)
-        if isfile(string)
+        if (!istoolong(string)) && isfile(string)
             content = reduce(*, readlines(string))
             # get rid of the ( and )
             attributes, moves... = split(content[3:end-1], ";")

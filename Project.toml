@@ -1,7 +1,7 @@
 name = "BadukGoWeiqiTools"
 uuid = "71566503-fddc-4190-936c-ecb38fefcffd"
 authors = ["xiaodaigh <zhuojia.dai@gmail.com> and contributors"]
-version = "0.1.7"
+version = "0.1.8"
 
 [deps]
 Cascadia = "54eefc05-d75b-58de-a785-1a3403f0919f"
