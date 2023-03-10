@@ -388,7 +388,6 @@ function create_player_info_tbl()
             end
         end
 
-
         res[key] = (json1.citizenship, json1.affiliation, json1.date_of_birth, json1.sex)
     end
 
@@ -433,6 +432,7 @@ function create_player_info_tbl()
 
     function update_natinoality!(name, region)
         idx = indexin(Ref(name), df.name)[1]
+        isnothing(idx) && return
         df[idx, :nationality] = region
         df
     end
@@ -442,6 +442,7 @@ function create_player_info_tbl()
     function update_sex!(name, sex)
         @assert sex in ("Male", "Female")
         idx = indexin(Ref(name), df.name)[1]
+        isnothing(idx) && return
         df[idx, :sex] = sex
         df
     end
