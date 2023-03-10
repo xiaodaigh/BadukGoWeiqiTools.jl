@@ -8,7 +8,7 @@ Some functions
 | -------- | ----- |
 | `load_namesdb(path="namesdb")` |  Creates a `Dict` that maps Kanji names to English and caches the result to `path`. If the cache exists, it will load from cache  |
 | `headtohead(name1, name2)` | Returns the head to head record of players according to goratings.org  |
-| `create_names_to_nationality_tbl()` | Returns a table with player name and nationality |
+| `create_player_info_tbl()` | Returns a table with player name and nationality and other info |
 
 ## Katago
 

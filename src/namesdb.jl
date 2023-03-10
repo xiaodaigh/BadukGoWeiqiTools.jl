@@ -1,14 +1,17 @@
 using JSON3
 using Serialization
 using TableScraper: scrape_tables
+using DataFrames: DataFrame
+using DataFrameMacros: @transform
+using Chain: @chain
 
 using CodecZlib: GzipDecompressor
 
-export load_namesdb, create_names_to_nationality_tbl, download_latest_ugo
+export load_namesdb, create_player_info_tbl, download_latest_ugo
 
 
 function download_latest_ugo()
-    latest_row = scrape_tables("https://u-go.net/playerdb-archive/", identity)[1].rows[2]
+    latest_row = scrape_tables("https://db.u-go.net/playerdb-archive/", identity)[1].rows[2]
     link = latest_row[3][1].attributes["href"]
     http = HTTP.request("GET", link)
 
@@ -18,7 +21,7 @@ end
 """
 Save a namesdb file somehwere
 """
-function load_namesdb(path = "namesdb"; force = false)
+function load_namesdb(path="namesdb"; force=false)
     if force | !isfile(path)
         # download latest names database from ugo.net
         json = download_latest_ugo()
@@ -171,7 +174,7 @@ manuals = Dict("金禹丞" => "Jin Yucheng",
     "高雄茉莉" => "Takao Mari",
     "沈載益" => "Sim Jaeik",
     "李沇" => "Lee Yeon",
-    "王楚軒"=>"Wang Chuxuan",
+    "王楚軒" => "Wang Chuxuan",
     "崔基勲" => "Choi Kihoon",
     "林賞圭" => "Im Sanggyu",
     "李瑟珠" => "Lee Suljoo",
@@ -198,140 +201,146 @@ manuals = Dict("金禹丞" => "Jin Yucheng",
     "王泽宇" => "Wang Zeyu",
     "李欣宸" => "Li Xinchen",
     "王硕00" => "Wang Shuo",
+    "高胤瑞" => "Ko Yoonseo",
+    "冮维杰" => "Jiang Weijie",
+    "酒井佑規" => "Sakai Yuki",
+    "高ミソ" => "Ko Miso",
+    "金京垠" => "Kim Kyeongeun",
+    "俞旿成" => "Yoo Ohseong",
+    "藤田怜央" => "Fujita Leo",
+    "上野梨紗" => "Ueno Risa",
+    "村本渉" => "Muramoto Wataru",
 
 
-    # yellow doesn't exist in go4go but could be  => "Choi Jeonggwan",
-    "김지우" =>	"Kim Jiwoo",
-    "김승진" =>	"Kim Seungjin",
-    "김성재" =>	"Kim Seongjae (2)",
-    "임진욱" =>	"Im Jinwook",
-    "김윤태" =>	"Kim Yuntae",
-    "원제훈" =>	"Won Jehoon",
-    "서윤서" =>	"Seo Yoonseo",
-    "최원진" =>	"Choi Wonjin",
-    "김현빈" =>	"Kim Hyunbin",
-    "신현석" =>	"Shin Hyunseok",
-    "조영숙" =>	"Cho Youngsook",
-    "허재원" =>	"Heo Jaewon",
-    "김사우" =>	"Kim Sawoo",
-    "이해원" =>	"Lee Haewon",
-    "김승구" =>	"Kim Seunggoo",
-    "이승민" =>	"Lee Seungmin",
+
+    # yellow doesn't exist in go4go but could be  => "Choi Jeonggwan =>	"Kim Jiwoo", =>	"Kim Seungjin",
+    "김성재" => "Kim Seongjae (2)",
+    "임진욱" => "Im Jinwook",
+    "김윤태" => "Kim Yuntae",
+    "원제훈" => "Won Jehoon",
+    "서윤서" => "Seo Yoonseo",
+    "최원진" => "Choi Wonjin",
+    "김현빈" => "Kim Hyunbin",
+    "신현석" => "Shin Hyunseok",
+    "조영숙" => "Cho Youngsook",
+    "허재원" => "Heo Jaewon",
+    "김사우" => "Kim Sawoo",
+    "이해원" => "Lee Haewon",
+    "김승구" => "Kim Seunggoo",
+    "이승민" => "Lee Seungmin",
 
     # green: gazza thinks go4go is wrong
-    "유주현" =>	"Yoo Joohyun",
-    "이상헌" =>	"Lee Sanghun (5p)",
-    "김선빈" =>	"Kim Seonbin",
+    "유주현" => "Yoo Joohyun",
+    "이상헌" => "Lee Sanghun (5p)",
+    "김선빈" => "Kim Seonbin",
 
     # white: suppose to be in go4go
-    "이영주" =>	"Lee Youngjoo",
-    "조완규" =>	"Cho Wankyu",
-    "이재성" =>	"Lee Jaesung",
-    "김민서" =>	"Kim Minseo",
-    "장은빈" =>	"Jang Eunbin",
-    "김상천" =>	"Kim Sangcheon",
-    "조승아" =>	"Cho Seungah",
-    "박신영" =>	"Park Sinyoung",
-    "박종훈" =>	"Park Jonghoon",
-    "심재익" =>	"Sim Jaeik",
-    "이유진" =>	"Lee Yujin",
-    "문지환" =>	"Moon Jihwan",
-    "장건현" =>	"Chang Geonhyun",
-    "박정근" =>	"Park Jeonggeon",
-    "김누리" =>	"Kim Nuri",
-    "한우진" =>	"Han Woojin",
-    "김선기" =>	"Kim Seongi",
-    "김효영" =>	"Kim Hyoyoung",
-    "문명근" =>	"Moon Myunggun",
-    "강지범" =>	"Kang Jibum",
-    "김기범" =>	"Kim Kibum",
-    "박진열" =>	"Park Jinyeol",
-    "강지훈" =>	"Kang Jihoon",
-    "선승민" =>	"Seon Seungmin",
-    "김민정" =>	"Kim Minjeong",
-    "오승민" =>	"Oh Seungmin",
-    "최원용" =>	"Choi Wongyong",
-    "이현준" =>	"Lee Hyeonjun",
-    "서무상" =>	"Seo Musang",
-    "윤예성" =>	"Yun Yeseong",
-    "허서현" =>	"Heo Seohyun",
-    "이성재" =>	"Lee Seongjae",
-    "강지수" =>	"Kang Jisoo",
-    "한상조" =>	"Han Sangcho",
-    "권주리" =>	"Kwon Juri",
-    "강다정" =>	"Kang Dajeong",
-    "최민서" =>	"Choi Minseo",
-    "윤성식" =>	"Yun Seongsik",
-    "오병우" =>	"Oh Byeongwoo",
-    "최광호" =>	"Choi Kyeongho",
-    "정유진" =>	"Jeong Yujin",
-    "홍석민" =>	"Hong Seokmin",
-    "이도현" =>	"Lee Dohyun",
-    "정서준" =>	"Jeong Seojun",
-    "김지명" =>	"Kim Jimyeong",
-    "신재원" =>	"Shin Jaewon",
-    "송규상" =>	"Song Gyusang",
-    "김영삼" =>	"Kim Yeongsam",
-    "차수권" =>	"Cha Sookwon",
-    "배준희" =>	"Bae Junhee",
-    "박지현" =>	"Park Jihyun",
-    "백현우" =>	"Baek Hyeonwoo",
-    "박태희" =>	"Park Taehee",
-    "김동우" =>	"Kim Dongwoo",
-    "김영광" =>	"Kim Yeongkwang",
-    "김정선" =>	"Kim Jeongsun",
-    "곽원근" =>	"Kwak Wonkeun",
-    "금지우" =>	"Geum Jiwoo",
-    "이기섭" =>	"Lee Kisup",
-    "주치홍" =>	"Ju Chihong",
-    "박상진" =>	"Park Sangjin",
-    "위태웅" =>	"Wi Taewoong",
-    "김노경" =>	"Kim Nokyeong",
-    "박정수" =>	"Park Jungsoo",
-    "박소율" =>	"Park Soyul",
-    "박지영" =>	"Park Jiyoung",
-    "이승준" =>	"Lee Seungjun",
-    "윤민중" =>	"Yun Minjung",
-    "양건" =>	"Yang Keon",
-    "박성수" =>	"Park Seunsoo",
-    "김경환" =>	"Kim Kyeonghwan",
-    "허영락" =>	"Heo Youngrak",
-    "박동주" =>	"Park Dongjoo",
-    "심준섭" =>	"Sim Junseop",
-    "김세현" =>	"Kim Sehyun",
-    "디아나" =>	"Diana Koszegi",
-    "양유준" =>	"Yang Yoojun",
-    "김범서" =>	"Kim Beomseo",
-    "문민종" =>	"Moon Minjong",
-    "정우진" =>	"Jeong Woojin",
-    "강우혁" =>	"Kang Woohyuk",
-    "이의현" =>	"Lee Euihyun",
-    "정두호" =>	"Jeong Dooho",
-    "김강민" =>	"Kim Kangmin",
-    "최진원" =>	"Choi Jinwon",
-    "윤혁" =>	"Yun Hyuk",
-    "김선호" =>	"Kim Sunho",
-    "김은지" =>	"Kim Eunji",
-    "이연" =>	"Lee Yeon",
-    "김경은" =>	"Kim Kyeongeun",
-    "김상인" =>	"Kim Sangin",
-    "김철중" =>	"Kim Chuljung",
-    "윤희우" =>	"Yun Heewoo",
-    "전용수" =>	"Jen Yongsoo",
-    "조남균" =>	"Cho Namkyun",
-    "최은규" =>	"Choi Eungyu",
-    "김준석" =>	"Kim Joonseok",
-    "이슬주" =>	"Lee Suljoo",
-    "현유빈" =>	"Hyun Yoobin",
-    "김창훈" =>	"Kim Changhoon",
-    "윤현빈" =>	"Yun Hyunbin",
-    "양민석" =>	"Yang Minseok",
-    "김유찬" =>	"Kim Yoochan",
-    "유오성" =>	"Yoo Ohseong",
-    "박현수" =>	"Park Hyunsoo",
-    "김기원" => "Kim Kiwon"
-
-)
+    "이영주" => "Lee Youngjoo",
+    "조완규" => "Cho Wankyu",
+    "이재성" => "Lee Jaesung",
+    "김민서" => "Kim Minseo",
+    "장은빈" => "Jang Eunbin",
+    "김상천" => "Kim Sangcheon",
+    "조승아" => "Cho Seungah",
+    "박신영" => "Park Sinyoung",
+    "박종훈" => "Park Jonghoon",
+    "심재익" => "Sim Jaeik",
+    "이유진" => "Lee Yujin",
+    "문지환" => "Moon Jihwan",
+    "장건현" => "Chang Geonhyun",
+    "박정근" => "Park Jeonggeon",
+    "김누리" => "Kim Nuri",
+    "한우진" => "Han Woojin",
+    "김선기" => "Kim Seongi",
+    "김효영" => "Kim Hyoyoung",
+    "문명근" => "Moon Myunggun",
+    "강지범" => "Kang Jibum",
+    "김기범" => "Kim Kibum",
+    "박진열" => "Park Jinyeol",
+    "강지훈" => "Kang Jihoon",
+    "선승민" => "Seon Seungmin",
+    "김민정" => "Kim Minjeong",
+    "오승민" => "Oh Seungmin",
+    "최원용" => "Choi Wongyong",
+    "이현준" => "Lee Hyeonjun",
+    "서무상" => "Seo Musang",
+    "윤예성" => "Yun Yeseong",
+    "허서현" => "Heo Seohyun",
+    "이성재" => "Lee Seongjae",
+    "강지수" => "Kang Jisoo",
+    "한상조" => "Han Sangcho",
+    "권주리" => "Kwon Juri",
+    "강다정" => "Kang Dajeong",
+    "최민서" => "Choi Minseo",
+    "윤성식" => "Yun Seongsik",
+    "오병우" => "Oh Byeongwoo",
+    "최광호" => "Choi Kyeongho",
+    "정유진" => "Jeong Yujin",
+    "홍석민" => "Hong Seokmin",
+    "이도현" => "Lee Dohyun",
+    "정서준" => "Jeong Seojun",
+    "김지명" => "Kim Jimyeong",
+    "신재원" => "Shin Jaewon",
+    "송규상" => "Song Gyusang",
+    "김영삼" => "Kim Yeongsam",
+    "차수권" => "Cha Sookwon",
+    "배준희" => "Bae Junhee",
+    "박지현" => "Park Jihyun",
+    "백현우" => "Baek Hyeonwoo",
+    "박태희" => "Park Taehee",
+    "김동우" => "Kim Dongwoo",
+    "김영광" => "Kim Yeongkwang",
+    "김정선" => "Kim Jeongsun",
+    "곽원근" => "Kwak Wonkeun",
+    "금지우" => "Geum Jiwoo",
+    "이기섭" => "Lee Kisup",
+    "주치홍" => "Ju Chihong",
+    "박상진" => "Park Sangjin",
+    "위태웅" => "Wi Taewoong",
+    "김노경" => "Kim Nokyeong",
+    "박정수" => "Park Jungsoo",
+    "박소율" => "Park Soyul",
+    "박지영" => "Park Jiyoung",
+    "이승준" => "Lee Seungjun",
+    "윤민중" => "Yun Minjung",
+    "양건" => "Yang Keon",
+    "박성수" => "Park Seunsoo",
+    "김경환" => "Kim Kyeonghwan",
+    "허영락" => "Heo Youngrak",
+    "박동주" => "Park Dongjoo",
+    "심준섭" => "Sim Junseop",
+    "김세현" => "Kim Sehyun",
+    "디아나" => "Diana Koszegi",
+    "양유준" => "Yang Yoojun",
+    "김범서" => "Kim Beomseo",
+    "문민종" => "Moon Minjong",
+    "정우진" => "Jeong Woojin",
+    "강우혁" => "Kang Woohyuk",
+    "이의현" => "Lee Euihyun",
+    "정두호" => "Jeong Dooho",
+    "김강민" => "Kim Kangmin",
+    "최진원" => "Choi Jinwon",
+    "윤혁" => "Yun Hyuk",
+    "김선호" => "Kim Sunho",
+    "김은지" => "Kim Eunji",
+    "이연" => "Lee Yeon",
+    "김경은" => "Kim Kyeongeun",
+    "김상인" => "Kim Sangin",
+    "김철중" => "Kim Chuljung",
+    "윤희우" => "Yun Heewoo",
+    "전용수" => "Jen Yongsoo",
+    "조남균" => "Cho Namkyun",
+    "최은규" => "Choi Eungyu",
+    "김준석" => "Kim Joonseok",
+    "이슬주" => "Lee Suljoo",
+    "현유빈" => "Hyun Yoobin",
+    "김창훈" => "Kim Changhoon",
+    "윤현빈" => "Yun Hyunbin",
+    "양민석" => "Yang Minseok",
+    "김유찬" => "Kim Yoochan",
+    "유오성" => "Yoo Ohseong",
+    "박현수" => "Park Hyunsoo",
+    "김기원" => "Kim Kiwon")
 
 function create_names_db(json::JSON3.Array)
     # if isfile("c:/git/BadukGoWeiqiTools/src/namesdb") & !force
@@ -471,7 +480,23 @@ function create_player_info_tbl()
         # ),
     )
 
+    df = @chain vcat(df, manual) begin
+        @transform :country = begin
+            (:affiliation == "Chinese Weiqi Association") && return "China"
+            (:affiliation == "Hanguk Kiwon") && return "Korea"
+            (:affiliation == "Korean Baduk Assoication") && return "Korea"
+            (:affiliation == "Nihon Kiin") && return "Japan"
+            (:affiliation == "Kansai Kiin") && return "Japan"
+            (:affiliation == "Taiwan Go Association") && return "Taiwan"
 
+            (:nationality == "KOR") && return "Korea"
+            (:nationality == "CHN") && return "China"
+            (:nationality == "TWN") && return "Taiwan"
+            (:nationality == "JPN") && return "Japan"
 
-    return vcat(df, manual)
+            return :nationality
+        end
+    end
+
+    return df
 end
