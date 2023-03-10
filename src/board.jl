@@ -4,13 +4,14 @@ export print, display
 
 @enum Stone b w e # black, white, empty
 
+import Base: print, display
 struct Board
-    board::Array{2,Stone}
+    board::Array{Stone,2}
+    Board() = new(fill(e, 19, 19))
 end
 
 
 function Base.print(board::Board)
-    # d = Dict(b => 'b', w => 'w', e => '.')
     for row in 1:19
         for col in 1:19
             print(board.board[row, col])
@@ -20,13 +21,17 @@ function Base.print(board::Board)
 end
 
 function Base.display(board::Board)
-    # d = Dict(b => 'b', w => 'w', e => '.')
     for row in 1:19
         for col in 1:19
             print(board.board[row, col])
         end
         println()
     end
+end
+
+
+function get_moves(sgf::SGF)
+    get_moves(sgf.moves)
 end
 
 
@@ -41,7 +46,7 @@ function get_moves(sgf1::AbstractString)
 end
 
 # fill the board
-function decode_move_str(move_str)
+function decode_move(move_str::String)
     color = move_str[1]
     @assert color in ('B', 'W')
     col = Int(move_str[3]) - 96
@@ -49,6 +54,11 @@ function decode_move_str(move_str)
 
     ifelse(color == 'B', b, w), row, col
 end
+
+function decode_move(move::Move)
+    decode_move(move.move_str)
+end
+
 
 # check if the stone at start_x, start_y is in a captured state
 function check_capture!(board, start_x, start_y, color)
@@ -124,17 +134,33 @@ function any_capture(board, row, col)
     reduce(vcat, [cp1, cp2, cp3, cp4])
 end
 
+function any_capture(board::Board, row, col)
+    any_capture(board.board, row, col)
+end
 
-function make_move!(board::Board, row, col, stone)
-    # color, row, col = decode_move_str(move_str)
-    board[row, col] = stone
+
+function make_move!(board::Board, row, col, stone::Stone)
+    @assert stone in (b, w)
+    board.board[row, col] = stone
 
     # if check if there's capture
     captures = unique(any_capture(board, row, col))
 
     for (row, col) in captures
-        board[row, col] = e
+        board.board[row, col] = e
     end
 
     return captures
+end
+
+function make_move!(board::Board, move::Move)
+    stone, row, col = decode_move(move)
+    make_move!(board, row, col, stone)
+end
+
+
+struct BoardSimulation
+    initboard::Board
+    playable_area::Array{Tuple{Int,Int},2}
+    stones_to_capture::Array{Tuple{Int,Int},2}
 end
