@@ -448,6 +448,25 @@ function create_player_info_tbl()
 
     update_sex!("Wang Xinghao", "Male")
 
+    update_sex!("Kim Eunji", "Female")
+
+    update_sex!("Xu Jingen", "Male")
+
+    update_sex!("Wang Chunhui", "Male")
+
+    update_sex!("Wang Zheyu", "Male")
+
+    update_sex!("Yao Xiaotong", "Male")
+    update_sex!("Lu Yuhua" , "Female")
+    update_sex!("Cho Wankyu" , "Male")
+    update_sex!("Heo Seohyun" , "Female")
+    update_sex!("Han Woojin" , "Male")
+    update_sex!("Tang Jiawen" , "Female")
+    update_sex!("Tang Jiawen" , "Female")
+    update_sex!("Lyu Liyan", "Male")
+    update_sex!("Duan Rong", "Male")
+
+
 
     manual = vcat(
         DataFrame(
